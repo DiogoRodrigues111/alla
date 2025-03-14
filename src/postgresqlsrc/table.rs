@@ -2,9 +2,9 @@
 pub trait PgSql {
     fn create_table_pgsql(&self);
 }
-struct PgSqlColumn {
-    name: String,
-    column_type: String,
+pub struct PgSqlColumn {
+    pub name: String,
+    pub column_type: String,
 }
 impl PgSqlColumn {
     fn new(name: &str, column_type: postgres::types::Type) -> Self {
