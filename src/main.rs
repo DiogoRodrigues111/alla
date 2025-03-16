@@ -9,7 +9,7 @@ mod postgresqlsrc {
 }
 
 fn main() {
-    postgresqlsrc::create::_pg_crate_database_first();
-    postgresqlsrc::table::_pg_create_table();
+    //postgresqlsrc::create::_pg_crate_database_first();
+    //postgresqlsrc::table::_pg_create_table();
     postgresqlsrc::insert::_pg_insert_data_to_current_table();
 }

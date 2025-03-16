@@ -1,5 +1,6 @@
 
 pub trait PgSql {
+    #[allow(unused)]
     fn create_database_pgsql(&self);
 }
 pub struct PgSqlDatabase {

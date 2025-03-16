@@ -1,15 +1,16 @@
-
 pub trait PgSqlInsert {
     fn new_to_table(&self, name: String, current_table: String) -> Self;
 }
 pub struct PgSqlData {
-    id: i32,
     new_data: String,
     email: String,
     password: String,
     current_table: String,
 }
 impl PgSqlInsert for PgSqlData {
+    /// Create an new table in Posgres
+    /// Params Optional: name is optional (dont have any effect)
+    /// Params Needed: _current_table is required
     fn new_to_table(&self, name: String, _current_table: String) -> Self {
         let _current_table = self.current_table.to_string();
         let table = crate::postgresqlsrc::table::PgSqlColumn {
@@ -32,7 +33,6 @@ impl PgSqlInsert for PgSqlData {
             Err(e) => {
                 println!("Error: {}", e);
                 return Self {
-                    id: 0,
                     new_data: String::new(),
                     email: String::new(),
                     password: String::new(),
@@ -40,13 +40,12 @@ impl PgSqlInsert for PgSqlData {
                 }
             }
         };
-        let query_format = std::format!("INSERT INTO {} VALUES ('{}', '{}', '{}', '{}')", table.name, &self.id, &self.new_data, &self.email, &self.password);
+        let query_format = std::format!("INSERT INTO {} (name, email, password) VALUES ('{}', '{}', '{}')", table.name, &self.new_data, &self.email, &self.password);
         match conn.execute(&query_format, &[]) {
-            Ok(_) => println!("New Data {}, {}, {}, {} Inserted", &self.id, &self.new_data, &self.email, &self.password),
+            Ok(_) => println!("New Data {}, {}, {} Inserted", &self.new_data, &self.email, &self.password),
             Err(e) => println!("Error: {}", e),
         }
         Self {
-            id: 0,
             new_data: name,
             email: String::new(),
             password: String::new(),
@@ -58,11 +57,10 @@ impl PgSqlInsert for PgSqlData {
 /// Main to PostgreSQL insert data
 pub fn _pg_insert_data_to_current_table() {
     let to_table = PgSqlData {
-        id: 0,
-        new_data: String::from("Hello, World"),
+        new_data: String::from("amigo 2"),
         email: String::from("MyEmail@Pro.com"),
         password: String::from("Minha Senha Segura"),
         current_table: String::from("users"),
     };
-    to_table.new_to_table(String::from("Ole Ola"), String::from("users"));
+    to_table.new_to_table(String::new(), String::from("users"));
 }

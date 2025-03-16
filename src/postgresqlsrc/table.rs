@@ -1,23 +1,33 @@
-
+#[allow(unused)]
 pub trait PgSql {
     fn create_table_pgsql(&self);
 }
 pub struct PgSqlColumn {
     pub name: String,
+    #[allow(unused)]
     pub column_type: String,
 }
 impl PgSqlColumn {
+    #[allow(unused)]
     fn new(name: &str, column_type: postgres::types::Type) -> Self {
         PgSqlColumn {
             name: name.to_string(),
             column_type: column_type.to_string(),
         }
     }
-
+    #[allow(unused)]
+    fn new_with_id_default(name: &str, column_type: &str) -> Self {
+        PgSqlColumn {
+            name: name.to_string(),
+            column_type: column_type.to_string(),
+        }
+    }
+    #[allow(unused)]
     fn to_string(&self) -> String {
         format!("{} {}", self.name, self.column_type)
     }
 }
+#[allow(unused)]
 struct PgSqlTable {
     name: String,
     columns: Vec<PgSqlColumn>,
@@ -80,10 +90,10 @@ pub fn _pg_create_table() {
     let table = PgSqlTable {
         name: String::from("users"),
         columns: vec![
-            PgSqlColumn::new("id", postgres::types::Type::INT4),
-            PgSqlColumn::new("name", postgres::types::Type::VARCHAR),
-            PgSqlColumn::new("email", postgres::types::Type::VARCHAR),
-            PgSqlColumn::new("password", postgres::types::Type::VARCHAR),
+            // Id: creation in pgAdmin
+            PgSqlColumn::new_with_id_default("name", "VARCHAR"),
+            PgSqlColumn::new_with_id_default("email", "VARCHAR"),
+            PgSqlColumn::new_with_id_default("password", "VARCHAR"),
         ],
         constraints: vec![],
     };
