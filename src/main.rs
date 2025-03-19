@@ -8,8 +8,11 @@ mod postgresqlsrc {
     pub mod update;
 }
 
+mod ini;
+
 fn main() {
     //postgresqlsrc::create::_pg_crate_database_first();
     //postgresqlsrc::table::_pg_create_table();
-    postgresqlsrc::insert::_pg_insert_data_to_current_table();
+    //postgresqlsrc::insert::_pg_insert_data_to_current_table();
+    ini::_ini_config_read_main();
 }

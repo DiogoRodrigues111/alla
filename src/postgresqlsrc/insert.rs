@@ -1,4 +1,5 @@
 pub trait PgSqlInsert {
+    #[allow(unused)]
     fn new_to_table(&self, name: String, current_table: String) -> Self;
 }
 pub struct PgSqlData {
@@ -9,7 +10,7 @@ pub struct PgSqlData {
 }
 impl PgSqlInsert for PgSqlData {
     /// Create an new table in Posgres
-    /// Params Optional: name is optional (dont have any effect)
+    /// Params Optional: name is required, I can use (String::new()) simple but it (dont have any effect)
     /// Params Needed: _current_table is required
     fn new_to_table(&self, name: String, _current_table: String) -> Self {
         let _current_table = self.current_table.to_string();
@@ -57,10 +58,11 @@ impl PgSqlInsert for PgSqlData {
 /// Main to PostgreSQL insert data
 pub fn _pg_insert_data_to_current_table() {
     let to_table = PgSqlData {
-        new_data: String::from("amigo 2"),
+        new_data: String::from("amigo 5"),
         email: String::from("MyEmail@Pro.com"),
         password: String::from("Minha Senha Segura"),
         current_table: String::from("users"),
     };
+    // 'name' for String::new() not have any function, but is required pass to
     to_table.new_to_table(String::new(), String::from("users"));
 }
