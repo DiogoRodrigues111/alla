@@ -1,6 +1,7 @@
 use std::{fs::File, io::Read};
 
 pub trait IniConfigInfo {
+    #[allow(unused)]
     fn read_of(&mut self, input_file: &str) -> Result<(), std::io::Error>;
 }
 pub struct IniConfig {

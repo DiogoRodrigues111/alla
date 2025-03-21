@@ -8,3 +8,10 @@ postgres = "0.19.10"
 aws-config = { version = "1.1.7", features = ["behavior-version-latest"] }
 aws-sdk-s3 = "1.79.0"
 tokio = { version = "1", features = ["full"] }
+gl = "0.14.0"
+nalgebra = "0.33.2"
+
+[dependencies.sdl2]
+version = "0.37"
+default-features = false
+features = ["ttf","image","gfx","mixer"]

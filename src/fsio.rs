@@ -12,6 +12,7 @@ struct FileSystemConfig {
     root: String,
 }
 impl FileSystem for FileSystemConfig {
+    
     fn list_dir(&self, path: &str) -> io::Result<String> {
         let full_path = Path::new(&self.root).join(path);
         let mut entities = Vec::new();
