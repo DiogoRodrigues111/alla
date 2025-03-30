@@ -4,7 +4,20 @@ use std::time::Instant;
 
 use na::{Matrix4, Perspective3, Point3, Vector3};
 
+use crate::sdl_rendering::model_loader::Vertex;
+
 mod shader_utils;
+mod model_loader;
+
+pub fn load_fbx_from_file(asset_path: &str) {
+    let mesh = model_loader::load_fbx(asset_path)
+        .expect("Erro ao carregar FBX");
+
+    println!("Modelo carregado! {} vértices e {} índices.",
+        mesh.vertices.len(),
+        mesh.indices.len()
+    );
+}
 
 pub fn _main_with_gl() {
     // --- Inicialização SDL2 ---
@@ -28,33 +41,56 @@ pub fn _main_with_gl() {
         gl::Enable(gl::DEPTH_TEST);
     }
 
+    let mesh_loading = model_loader::Mesh { indices: Vec::new(), vertices: Vec::new() };
+
     // --- Definindo cubo ---
-    let vertices: [f32; 90] = [
-        // positions
-        -0.5, -0.5, -0.5,  0.5, -0.5, -0.5,  0.5,  0.5, -0.5,  0.5,  0.5, -0.5, -0.5,  0.5, -0.5, -0.5, -0.5, -0.5,
-        -0.5, -0.5,  0.5,  0.5, -0.5,  0.5,  0.5,  0.5,  0.5,  0.5,  0.5,  0.5, -0.5,  0.5,  0.5, -0.5, -0.5,  0.5,
-        -0.5,  0.5,  0.5, -0.5,  0.5, -0.5,  0.5,  0.5, -0.5,  0.5,  0.5, -0.5,  0.5,  0.5,  0.5, -0.5,  0.5,  0.5,
-         0.5, -0.5, -0.5,  0.5,  0.5, -0.5,  0.5,  0.5,  0.5,  0.5,  0.5,  0.5,  0.5, -0.5,  0.5,  0.5, -0.5, -0.5,
-        -0.5, -0.5, -0.5, -0.5,  0.5, -0.5, -0.5,  0.5,  0.5, -0.5,  0.5,  0.5, -0.5, -0.5,  0.5, -0.5, -0.5, -0.5,
-    ];
+    // let vertices: [f32; 90] = [
+    //     // positions
+    //     -0.5, -0.5, -0.5,  0.5, -0.5, -0.5,  0.5,  0.5, -0.5,  0.5,  0.5, -0.5, -0.5,  0.5, -0.5, -0.5, -0.5, -0.5,
+    //     -0.5, -0.5,  0.5,  0.5, -0.5,  0.5,  0.5,  0.5,  0.5,  0.5,  0.5,  0.5, -0.5,  0.5,  0.5, -0.5, -0.5,  0.5,
+    //     -0.5,  0.5,  0.5, -0.5,  0.5, -0.5,  0.5,  0.5, -0.5,  0.5,  0.5, -0.5,  0.5,  0.5,  0.5, -0.5,  0.5,  0.5,
+    //      0.5, -0.5, -0.5,  0.5,  0.5, -0.5,  0.5,  0.5,  0.5,  0.5,  0.5,  0.5,  0.5, -0.5,  0.5,  0.5, -0.5, -0.5,
+    //     -0.5, -0.5, -0.5, -0.5,  0.5, -0.5, -0.5,  0.5,  0.5, -0.5,  0.5,  0.5, -0.5, -0.5,  0.5, -0.5, -0.5, -0.5,
+    // ];
 
-    let (mut vao, mut vbo) = (0, 0);
+    let (vao, mut vbo, mut ebo) = (0, 0, 0);
+    // unsafe {
+    //     gl::GenVertexArrays(1, &mut vao);
+    //     gl::GenBuffers(1, &mut vbo);
+
+    //     gl::BindVertexArray(vao);
+    //     gl::BindBuffer(gl::ARRAY_BUFFER, vbo);
+    //     gl::BufferData(
+    //         gl::ARRAY_BUFFER,
+    //         (vertices.len() * std::mem::size_of::<f32>()) as isize,
+    //         vertices.as_ptr() as *const _,
+    //         gl::STATIC_DRAW,
+    //     );
+
+    //     gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, 3 * 4, std::ptr::null());
+    //     gl::EnableVertexAttribArray(0);
+    // }
+
     unsafe {
-        gl::GenVertexArrays(1, &mut vao);
         gl::GenBuffers(1, &mut vbo);
-
-        gl::BindVertexArray(vao);
         gl::BindBuffer(gl::ARRAY_BUFFER, vbo);
         gl::BufferData(
             gl::ARRAY_BUFFER,
-            (vertices.len() * std::mem::size_of::<f32>()) as isize,
-            vertices.as_ptr() as *const _,
+            (mesh_loading.vertices.len() * std::mem::size_of::<Vertex>()) as isize,
+            mesh_loading.vertices.as_ptr() as *const _,
             gl::STATIC_DRAW,
         );
-
-        gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, 3 * 4, std::ptr::null());
-        gl::EnableVertexAttribArray(0);
+    
+        gl::GenBuffers(1, &mut ebo);
+        gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, ebo);
+        gl::BufferData(
+            gl::ELEMENT_ARRAY_BUFFER,
+            (mesh_loading.indices.len() * std::mem::size_of::<u32>()) as isize,
+            mesh_loading.indices.as_ptr() as *const _,
+            gl::STATIC_DRAW,
+        );
     }
+    
 
     let shader = shader_utils::Shader::new("src/sdl_rendering/shader_utils/vertex_shader.glsl", "src/sdl_rendering/shader_utils/fragment_shader.glsl");
 

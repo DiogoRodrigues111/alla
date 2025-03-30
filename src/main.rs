@@ -23,4 +23,5 @@ fn main() {
     //config::_ini_config_read_main();
 
     sdl_rendering::_main_with_gl();
+    sdl_rendering::load_fbx_from_file("arch/prim/cube.fbx");
 }

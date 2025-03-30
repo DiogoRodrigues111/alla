@@ -30,6 +30,8 @@ dependencies = [
 name = "alla"
 version = "0.1.0"
 dependencies = [
+ "assimp",
+ "assimp-sys",
  "aws-config",
  "aws-sdk-s3",
  "cc",
@@ -53,6 +55,26 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cab112f0a86d568ea0e627cc1d6be74a1e9cd55214684db5561995f6dad897c6"
 dependencies = [
  "num-traits",
+]
+
+[[package]]
+name = "assimp"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8a003409c21e542939691938907c7dd12293e2c258386aa25abc6929ea79d87f"
+dependencies = [
+ "assimp-sys",
+]
+
+[[package]]
+name = "assimp-sys"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2dd0afdd38abb878acff2f7074e3846c8af2482db619a23c9c8448cf57d11875"
+dependencies = [
+ "bitflags 0.9.1",
+ "cmake",
+ "pkg-config",
 ]
 
 [[package]]
@@ -574,6 +596,12 @@ dependencies = [
  "syn",
  "which",
 ]
+
+[[package]]
+name = "bitflags"
+version = "0.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4efd02e230a02e18f92fc2735f44597385ed02ad8f831e7c1c1156ee5e1ab3a5"
 
 [[package]]
 name = "bitflags"
@@ -1824,6 +1852,12 @@ dependencies = [
  "der",
  "spki",
 ]
+
+[[package]]
+name = "pkg-config"
+version = "0.3.32"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7edddbd0b52d732b21ad9a5fab5c704c14cd949e5e9a1ec5929a24fded1b904c"
 
 [[package]]
 name = "postgres"
