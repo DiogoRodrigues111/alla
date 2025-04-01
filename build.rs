@@ -18,4 +18,8 @@ fn main() {
     // gfx
     println!("cargo:rustc-link-search=native=libraries/SDL2_gfx-1.0.4-VC/SDL2_gfx-1.0.4/lib/x64");
     println!("cargo:rustc-link-lib=libraries/SDL2_gfx-1.0.4-VC/SDL2_gfx-1.0.4/lib/x64/SDL2_gfx");
+    
+    // Assimp
+    println!("cargo:rustc-link-search=native=libraries/Assimp");
+    println!("cargo:rustc-link-lib=libraries/Assimp/assimp");
 }
