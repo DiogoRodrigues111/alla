@@ -10,6 +10,7 @@ aws-sdk-s3 = "1.79.0"
 tokio = { version = "1", features = ["full"] }
 gl = "0.14.0"
 nalgebra = "0.33.2"
+russimp = { version = "3.2.0", features = ["prebuilt"] }
 
 [dependencies.sdl2]
 version = "0.37"
