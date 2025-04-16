@@ -57,42 +57,21 @@ pub fn _main_with_gl() {
     ];
 
     // --- Importer the model, assimp into the 3D scene ---
-    /*** 
-    #### The accord with manual forcesing the user-creator say: ####
-        vec![
-            PostProcess::CalculateTangentSpace,
-            PostProcess::Triangulate,
-            PostProcess::JoinIdenticalVertices,
-            PostProcess::SortByPrimitiveType]
-            ).unwrap(); 
-    ####
-        Myself:
-            PostProcess::Triangulate 
-            , PostProcess::JoinIdenticalVertices 
-            , PostProcess::ValidateDataStructure
-            , PostProcess::OptimizeMeshes 
-        ***/
     let post_process_steps = vec![
             PostProcess::CalculateTangentSpace,
             PostProcess::Triangulate,
             PostProcess::JoinIdenticalVertices,
             PostProcess::SortByPrimitiveType];
 
-    let scene_importer: SceneImporter = SceneImporter {
-        mesh: Mesh::default(),
-        pos: [0.0, 0.0, 0.0],
-        path_to_file: String::new(),
-    };
-    let mut importer_to_scene = SceneImporter::new(&scene_importer);
+    let mut importer_to_scene = SceneImporter::new();
     importer_to_scene.path_to_file = String::from("arch/room/room.obj");
     let path_archive = importer_to_scene.path_to_file.to_string();
     let scene_from_file = Scene::from_file(&path_archive, post_process_steps).unwrap();
 
     let mesh = &scene_from_file.meshes[0];
     let vertices: Vec<SceneImporter> = mesh.vertices.iter().map(|v| SceneImporter {
-        mesh: Mesh::default(),
         pos: [v.x, v.y, v.z],
-        path_to_file: String::new(),
+        path_to_file: importer_to_scene.path_to_file.clone(),
     }).collect();
     let indices: Vec<u32> = mesh.faces.iter().flat_map(|f| f.0.clone()).collect();
 

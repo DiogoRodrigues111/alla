@@ -1,0 +1,16 @@
+### --- russimp ###---
+ /*** 
+    #### The accord with manual forcesing the user-creator say: ####
+        vec![
+            PostProcess::CalculateTangentSpace,
+            PostProcess::Triangulate,
+            PostProcess::JoinIdenticalVertices,
+            PostProcess::SortByPrimitiveType]
+            ).unwrap(); 
+    ####
+        Myself:
+            PostProcess::Triangulate 
+            , PostProcess::JoinIdenticalVertices 
+            , PostProcess::ValidateDataStructure
+            , PostProcess::OptimizeMeshes 
+        ***/
