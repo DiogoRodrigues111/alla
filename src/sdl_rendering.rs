@@ -1,11 +1,28 @@
+use importer::SceneImporter;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use std::time::Instant;
-
+use russimp::{mesh::Mesh, scene::{PostProcess, Scene}};
 use na::{Matrix4, Perspective3, Point3, Vector3};
 
 mod shader_utils;
+mod importer;
 
+/// Main function to run the SDL2 OpenGL application
+/// This function initializes SDL2, creates a window, and sets up OpenGL context.
+/// It also handles user input for camera movement and renders a 3D scene with a model.
+/// # Example
+/// ```rust```
+/// fn main() {
+///    _main_with_gl();
+/// }
+/// ```
+/// # Panics
+/// This function may panic if there are issues with SDL2 initialization, window creation, or OpenGL context creation.
+/// It may also panic if there are issues with loading OpenGL functions or creating shaders.
+/// # Errors
+/// This function may return errors related to SDL2 initialization, window creation, OpenGL context creation, or shader compilation.
+/// It may also return errors related to importing the 3D model using Assimp.
 pub fn _main_with_gl() {
     // --- Inicialização SDL2 ---
     let sdl = sdl2::init().unwrap();
@@ -29,6 +46,7 @@ pub fn _main_with_gl() {
     }
 
     // --- Definindo cubo ---
+    #[allow(unused)]
     let vertices: [f32; 90] = [
         // positions
         -0.5, -0.5, -0.5,  0.5, -0.5, -0.5,  0.5,  0.5, -0.5,  0.5,  0.5, -0.5, -0.5,  0.5, -0.5, -0.5, -0.5, -0.5,
@@ -38,10 +56,52 @@ pub fn _main_with_gl() {
         -0.5, -0.5, -0.5, -0.5,  0.5, -0.5, -0.5,  0.5,  0.5, -0.5,  0.5,  0.5, -0.5, -0.5,  0.5, -0.5, -0.5, -0.5,
     ];
 
-    let (mut vao, mut vbo) = (0, 0);
+    // --- Importer the model, assimp into the 3D scene ---
+    /*** 
+    #### The accord with manual forcesing the user-creator say: ####
+        vec![
+            PostProcess::CalculateTangentSpace,
+            PostProcess::Triangulate,
+            PostProcess::JoinIdenticalVertices,
+            PostProcess::SortByPrimitiveType]
+            ).unwrap(); 
+    ####
+        Myself:
+            PostProcess::Triangulate 
+            , PostProcess::JoinIdenticalVertices 
+            , PostProcess::ValidateDataStructure
+            , PostProcess::OptimizeMeshes 
+        ***/
+    let post_process_steps = vec![
+            PostProcess::CalculateTangentSpace,
+            PostProcess::Triangulate,
+            PostProcess::JoinIdenticalVertices,
+            PostProcess::SortByPrimitiveType];
+
+    let scene_importer: SceneImporter = SceneImporter {
+        mesh: Mesh::default(),
+        pos: [0.0, 0.0, 0.0],
+        path_to_file: String::new(),
+    };
+    let mut importer_to_scene = SceneImporter::new(&scene_importer);
+    importer_to_scene.path_to_file = String::from("arch/room/room.obj");
+    let path_archive = importer_to_scene.path_to_file.to_string();
+    let scene_from_file = Scene::from_file(&path_archive, post_process_steps).unwrap();
+
+    let mesh = &scene_from_file.meshes[0];
+    let vertices: Vec<SceneImporter> = mesh.vertices.iter().map(|v| SceneImporter {
+        mesh: Mesh::default(),
+        pos: [v.x, v.y, v.z],
+        path_to_file: String::new(),
+    }).collect();
+    let indices: Vec<u32> = mesh.faces.iter().flat_map(|f| f.0.clone()).collect();
+
+    let (mut vao, mut vbo, mut ebo) = (0, 0, 0);
+
     unsafe {
         gl::GenVertexArrays(1, &mut vao);
         gl::GenBuffers(1, &mut vbo);
+        gl::GenBuffers(1, &mut ebo);
 
         gl::BindVertexArray(vao);
         gl::BindBuffer(gl::ARRAY_BUFFER, vbo);
@@ -52,8 +112,18 @@ pub fn _main_with_gl() {
             gl::STATIC_DRAW,
         );
 
-        gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, 3 * 4, std::ptr::null());
+        gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, ebo);
+        gl::BufferData(
+            gl::ELEMENT_ARRAY_BUFFER,
+            (indices.len() * std::mem::size_of::<u32>()) as isize,
+            indices.as_ptr() as *const _,
+            gl::STATIC_DRAW,
+        );
         gl::EnableVertexAttribArray(0);
+        gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, std::mem::size_of::<SceneImporter>() as i32, std::ptr::null());
+        gl::BindVertexArray(0);
+
+        gl::Enable(gl::DEPTH_TEST);
     }
 
     let shader = shader_utils::Shader::new("src/sdl_rendering/shader_utils/vertex_shader.glsl", "src/sdl_rendering/shader_utils/fragment_shader.glsl");
@@ -122,6 +192,13 @@ pub fn _main_with_gl() {
         unsafe {
             gl::ClearColor(0.1, 0.1, 0.1, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
+            gl::BindVertexArray(vao);
+            gl::DrawElements(
+                gl::TRIANGLES,
+                indices.len() as i32,
+                gl::UNSIGNED_INT,
+                std::ptr::null(),
+            );
         }
 
         shader.use_program();
